@@ -2,7 +2,7 @@
 
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const ObjectId = Schema.ObjectId;
+const bcrypt = require('bcrypt');
 
 const usersSchema = new Schema({
     local: {
@@ -11,6 +11,14 @@ const usersSchema = new Schema({
         lastLogin: { type: Date, default: Date.now }
     }
 });
+
+usersSchema.methods.generateHash = function(password){
+    return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
+}
+
+usersSchema.methods.validPassword = function(password){
+    return bcrypt.compareSync(password, this.local.password);
+}
 
 const users = mongoose.model('Users', usersSchema);
 
